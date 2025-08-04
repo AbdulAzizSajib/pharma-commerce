@@ -46,7 +46,7 @@
                 rel="noopener noreferrer"
                 href="#"
                 class="flex items-center px-1 capitalize"
-                >{{ productDetail?.title }}</span
+                >{{ productDetail?.product?.name }}</span
               >
             </li>
           </ol>
@@ -63,27 +63,55 @@
               <div class="lg:order-2 lg:ml-5">
                 <div class="overflow-hidden rounded-lg">
                   <Loader v-if="isFetching" />
-                  <a-image
-                    :src="imgBase + productDetail?.image"
-                    class="w-full"
-                  />
+                  <a-image :src="default_img" class="w-full" />
                 </div>
               </div>
 
               <div class="mt-2 w-full lg:w-32 lg:flex-shrink-0">
                 <div class="flex flex-row items-start lg:flex-col">
-                  <template v-for="sideImge in productDetail?.images">
-                    <button
-                      type="button"
-                      class="flex-0 border items-center w-full flex justify-center aspect-square mb-3 h-20 overflow-hidden rounded-lg text-center"
-                    >
-                      <a-image
-                        class="object-cover border"
-                        :src="imgBase + sideImge?.image"
-                        alt=""
-                      />
-                    </button>
-                  </template>
+                  <button
+                    type="button"
+                    class="flex-0 border items-center w-full flex justify-center aspect-square mb-3 h-20 overflow-hidden rounded-lg text-center"
+                  >
+                    <a-image
+                      class="object-cover border"
+                      :src="default_img"
+                      alt=""
+                    />
+                  </button>
+                  <button
+                    type="button"
+                    class="flex-0 border items-center w-full flex justify-center aspect-square mb-3 h-20 overflow-hidden rounded-lg text-center"
+                  >
+                    <a-image
+                      class="object-cover border"
+                      :src="default_img"
+                      alt=""
+                    />
+                  </button>
+                  <button
+                    type="button"
+                    class="flex-0 border items-center w-full flex justify-center aspect-square mb-3 h-20 overflow-hidden rounded-lg text-center"
+                  >
+                    <a-image
+                      class="object-cover border"
+                      :src="default_img"
+                      alt=""
+                    />
+                  </button>
+
+                  <!-- <template v-for="sideImge in productDetail?.images">
+                      <button
+                        type="button"
+                        class="flex-0 border items-center w-full flex justify-center aspect-square mb-3 h-20 overflow-hidden rounded-lg text-center"
+                      >
+                        <a-image
+                          class="object-cover border"
+                          :src="imgBase + sideImge?.image"
+                          alt=""
+                        />
+                      </button>
+                    </template> -->
                 </div>
               </div>
             </div>
@@ -93,13 +121,19 @@
             <h1
               class="flex items-center gap-2 font-bold text-gray-900 text-sm lg:text-xl"
             >
-              {{ productDetail?.title }}
-              <span class="text-sm border p-1 rounded-md bg-green-300">{{
-                productDetail?.badge
-              }}</span>
+              {{ productDetail?.product?.name }}
             </h1>
+            <p class="text-sm p-1">
+              Generics : {{ productDetail?.generics[0]?.name }}
+            </p>
+            <p class="text-sm p-1">
+              Categories : {{ productDetail?.categories?.at(0)?.name }}
+            </p>
+            <!-- <p class="text-sm p-1">
+              Company : {{ productDetail?.product?.supplier?.company_name }}
+            </p> -->
 
-            <div class="mt-5 flex items-center">
+            <!-- <div class="mt-5 flex items-center">
               <div class="flex items-center">
                 <i class="fa-solid fa-star text-yellow-500"></i>
                 <i class="fa-solid fa-star text-yellow-500"></i>
@@ -110,21 +144,21 @@
               <p class="ml-2 text-sm font-medium text-gray-500">
                 {{ productDetail?.review_count }} Reviews
               </p>
-            </div>
+            </div> -->
 
             <h2 class="mt-2 text-xl font-bold text-gray-900">
-              {{ productDetail?.offered }} BDT
-              <span class="line-through font-light text-base text-gray-500"
+              {{ productDetail?.product?.product_prices?.selling_price }} BDT
+              <!-- <span class="line-through font-light text-base text-gray-500"
                 >{{ productDetail?.selling }} BDT</span
-              >
-              <span class="px-2 ml-3 text-sm rounded-2xl bg-red-300"
+              > -->
+              <!-- <span class="px-2 ml-3 text-sm rounded-2xl bg-red-300"
                 >{{
                   productDetail?.selling - productDetail?.offered > 0
                     ? productDetail?.selling - productDetail?.offered
                     : 0
                 }}
                 BDT</span
-              >
+              > -->
             </h2>
 
             <hr class="border mt-3" />
@@ -133,16 +167,15 @@
               <div>
                 <h2 class="flex items-center">
                   Brand:
-                  <span class="ml-2">
-                    <i class="fa-solid fa-leaf text-primary"></i
-                    >{{ productDetail?.brand?.title }}</span
+                  <span class="my-2">
+                    {{ productDetail?.product?.supplier?.company_name }}</span
                   >
                 </h2>
               </div>
             </div>
 
-            <div v-html="productDetail?.description"></div>
-            <div v-html="productDetail?.overview"></div>
+            <!-- <div v-html="productDetail?.description"></div>
+            <div v-html="productDetail?.overview"></div> -->
 
             <!-- <hr class="border mt-2"> -->
 
@@ -265,6 +298,10 @@
         </a-tabs>
       </div>
     </section>
+    <!-- <pre>
+     {{ productDetail }}
+   </pre
+    > -->
   </Mainlayout>
 </template>
 
@@ -288,6 +325,7 @@ const reviewDetail = ref("");
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 import { useWishlistStore } from "@/stores/wishlist";
+import default_img from "../../assets/images/Banner/default.jpg";
 
 const route = useRoute();
 
@@ -306,14 +344,15 @@ const quantity = ref(1);
 
 const handleAddToCart = () => {
   getCart(
-    productDetail.value?.id,
-    productDetail.value?.title,
-    productDetail.value?.offered,
-    imgBase + productDetail.value?.imageSrc,
+    productDetail.value?.product?.id,
+    productDetail.value?.product?.name,
+    productDetail.value?.categories?.at(0).name,
+    productDetail.value?.product_prices?.selling_price,
+    productDetail.value,
     quantity.value
   );
 
-  toast.success(`${productDetail.value?.title} added to cart!`, {
+  toast.success(`${productDetail.value?.product?.name} added to cart!`, {
     position: "top-center",
     autoClose: 2000,
   });

@@ -33,7 +33,7 @@
       </div>
     </div>
 
-    <div class="grow mx-4 hidden md:block relative">
+    <!-- <div class="grow mx-4 hidden md:block relative">
       <div class="relative w-full">
         <input
           type="text"
@@ -61,17 +61,16 @@
           >
             <router-link :to="`/product/${item.id}`">
               <div class="rounded-md">
-                <!-- Product Name -->
                 <h3 class="font-bold text-lg">{{ item.name }}</h3>
-                <!-- Product Category -->
+
                 <p class="text-sm text-gray-600">
                   Category: {{ item.category.name }}
                 </p>
-                <!-- Supplier -->
+
                 <p class="text-sm text-gray-600">
                   Supplier: {{ item.supplier.company_name }}
                 </p>
-                <!-- Price -->
+
                 <p class="text-sm text-gray-600">
                   Price: ${{ item.pack_size.selling_price }}
                 </p>
@@ -80,8 +79,35 @@
           </li>
         </ul>
       </div>
-    </div>
+    </div> -->
+    <div class="row mx-4 hidden md:block w-full">
+      <a-select
+        show-search
+        :filterOption="false"
+        @search="searchHandle($event)"
+        class="w-full capitalize"
+      >
+        <a-select-option v-for="item in searchData" :key="item.id">
+          <router-link :to="`/product/${item?.id}`">
+            <div class="rounded-md capitalize">
+              <h3 class="font-bold text-lg">{{ item?.name }}</h3>
 
+              <p class="text-sm text-gray-600">
+                Category: {{ item?.category?.name }}
+              </p>
+
+              <p class="text-sm text-gray-600">
+                Supplier: {{ item?.supplier?.company_name }}
+              </p>
+
+              <p class="text-sm text-gray-600">
+                Price:{{ item?.pack_size?.selling_price }}
+              </p>
+            </div>
+          </router-link>
+        </a-select-option>
+      </a-select>
+    </div>
     <!-- cart -->
 
     <div class="hidden md:flex space-x-4 items-center">
@@ -187,7 +213,7 @@
 
       <ul class="list-none">
         <li class="mb-2">
-          <a-dropdown>
+          <!-- <a-dropdown>
             <a class="ant-dropdown-link">
               <a-input
                 type="text"
@@ -211,7 +237,7 @@
                 </a-menu-item>
               </a-menu>
             </template>
-          </a-dropdown>
+          </a-dropdown> -->
         </li>
         <li class="mb-2">
           <router-link class="block font-semibold" :to="{ name: 'home' }"
@@ -304,14 +330,15 @@ const isLoggedIn = ref(localStorage.getItem("token") !== null);
 
 const handleLogout = () => {
   logout();
-  isLoggedIn.value = false;
+  // isLoggedIn.value = false;
   localStorage.removeItem("token");
 };
 
-const searchHandle = async () => {
+const searchHandle = async (event) => {
+  // console.log(event.target.value);
   try {
     const res = await axios.get(
-      `${apiBasePharma}/products/search?term=${q.value}`
+      `${apiBasePharma}/products/search?term=${event}`
     );
     if (res?.data) {
       searchData.value = res.data.products;
@@ -322,13 +349,6 @@ const searchHandle = async () => {
   } catch (error) {
     searchData.value = [];
     console.error("Search error:", error);
-  }
-};
-
-// Clear searchData when the input field is empty
-const clearSearchDataIfEmpty = () => {
-  if (!q.value.trim()) {
-    searchData.value = [];
   }
 };
 </script>

@@ -65,11 +65,14 @@ onMounted(async () => await getHome());
           </h2>
         </div>
         <div>
-          <button
+          <!-- <button
             class="text-[9px] btn btn-xs bg-[#007c46] text-white lg:btn-md"
           >
             View All
-          </button>
+          </button> -->
+          <RouterLink :to="{ name: 'shop' }">
+            <button class="btn-primary">View All</button>
+          </RouterLink>
         </div>
       </div>
       <Collection :collections="collections" :isFetching="isFetching" />

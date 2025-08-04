@@ -61,16 +61,20 @@
                   Your Shopping Bag is Empty!
                 </td>
               </tr>
+              <!-- <pre>
+                {{ cartProduct[0]?.image?.name }}
+            </pre> -->
               <tr v-for="(product, index) in cartProduct" :key="index">
                 <td>
                   <div class="flex items-center gap-3">
                     <div class="avatar">
                       <div class="mask mask-squircle h-12 w-12">
-                        <img :src="product.image" alt="Avatar" />
+                        <img :src="default_img" alt="Avatar" />
                       </div>
                     </div>
                     <div>
-                      <div :title="product?.title" class="font-bold">
+                      <h1 class="text-sm">{{ product?.image?.name }}</h1>
+                      <div :title="product?.title" class="">
                         {{
                           product?.title?.length > 20
                             ? product?.title?.slice(0, 20) + ".."
@@ -81,7 +85,7 @@
                   </div>
                 </td>
                 <td class="text-right">
-                  <span>{{ product.price }}</span>
+                  <span> {{ Number(product.price).toFixed(2) }}</span>
                 </td>
                 <td>
                   <div class="flex justify-center items-center">
@@ -159,7 +163,9 @@
           <tbody>
             <tr class="border-b">
               <td class="py-2">Subtotal:</td>
-              <td class="text-right py-2">{{ totalPrice }} BDT</td>
+              <td class="text-right py-2">
+                {{ Number(totalPrice).toFixed(2) }} BDT
+              </td>
             </tr>
             <tr class="border-b">
               <td class="py-2">Coupon:</td>
@@ -172,7 +178,7 @@
             <tr class="border-b">
               <td class="py-2 font-semibold">Total:</td>
               <td class="text-right py-2 font-semibold">
-                {{ totalPrice }} BDT
+                {{ Number(totalPrice).toFixed(2) }} BDT
               </td>
             </tr>
           </tbody>
@@ -196,6 +202,7 @@ import Mainlayout from "@/components/Layouts/Mainlayout.vue";
 import { DeleteOutlined, HomeOutlined } from "@ant-design/icons-vue";
 import { useCartStore } from "@/stores/cart";
 import { storeToRefs } from "pinia";
+import default_img from "../../assets/images/Banner/default.jpg";
 
 const cartStore = useCartStore();
 const { cartProduct, totalPrice } = storeToRefs(cartStore);

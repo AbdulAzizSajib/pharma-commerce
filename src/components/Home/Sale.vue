@@ -2,6 +2,7 @@
 import VueCountdown from "@chenfengyuan/vue-countdown";
 import ProductGrid from "@/components/Products/Grid.vue";
 import { computed, ref } from "vue";
+import { RouterLink } from "vue-router";
 
 const props = defineProps(["flash_sales"]);
 const endDate = computed(() => new Date(props.flash_sales?.end_time));
@@ -77,7 +78,9 @@ const timeInMs = computed(() => {
       </div>
     </div>
     <div>
-      <button class="btn-primary">View All</button>
+      <RouterLink :to="{ name: 'shop' }">
+        <button class="btn-primary">View All</button>
+      </RouterLink>
     </div>
   </div>
   <!-- Products -->

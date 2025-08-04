@@ -31,7 +31,7 @@ onMounted(async () => {
 });
 
 const current1 = ref(1);
-const pageSize = ref(10);
+const pageSize = ref(52);
 
 const pagination = async (page) => {
   current1.value = page;
@@ -251,6 +251,24 @@ const filterByPrice = async () => {
               </h2>
             </div>
             <!-- prodcuts -->
+
+            <div
+              v-if="isFetching"
+              class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-5"
+            >
+              <a-skeleton />
+              <a-skeleton />
+              <a-skeleton />
+              <a-skeleton />
+              <a-skeleton />
+              <a-skeleton />
+              <a-skeleton />
+              <a-skeleton />
+              <a-skeleton />
+              <a-skeleton />
+              <a-skeleton />
+              <a-skeleton />
+            </div>
 
             <div
               class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-5"

@@ -13,10 +13,10 @@ export const useProductsStore = defineStore("productsStore", {
     async getProduct(id) {
       this.isFetching = true;
       try {
-        const res = await axios.get(`${apiBase}/product/${id}`);
+        const res = await axios.get(`${apiBasePharma}/product-show/${id}`);
         this.isFetching = false;
         if (res?.status == 200) {
-          return res?.data?.data;
+          return res.data;
           // this.slider = res?.data?.data?.slider;
         }
       } catch (error) {
