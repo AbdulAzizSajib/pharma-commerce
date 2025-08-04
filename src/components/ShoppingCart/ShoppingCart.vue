@@ -197,8 +197,6 @@ import { DeleteOutlined, HomeOutlined } from "@ant-design/icons-vue";
 import { useCartStore } from "@/stores/cart";
 import { storeToRefs } from "pinia";
 
-const quantity = ref(1);
-
 const cartStore = useCartStore();
 const { cartProduct, totalPrice } = storeToRefs(cartStore);
 </script>

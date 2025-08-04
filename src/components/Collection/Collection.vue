@@ -13,8 +13,25 @@ defineProps(["collections", "isFetching"]);
       <Loader v-if="isFetching" />
       <Loader v-if="isFetching" />
       <Loader v-if="isFetching" />
+      <!-- collections?.product_collections?.slice(0, 4)" -->
       <ProductCard
-        v-for="(item, index) in collections?.product_collections?.slice(0, 4)"
+        v-for="(item, index) in collections"
+        :key="index"
+        :name="item?.name"
+        :id="item?.id"
+        :title="item?.category?.name"
+        :price="item?.product_prices?.selling_price"
+        :products="item"
+        :imageSrc="item"
+      />
+    </div>
+  </div>
+</template>
+
+<style lang="scss" scoped></style>
+
+<!-- <ProductCard
+        v-for="(item, index) in collections"
         :key="index"
         :id="item?.product?.id"
         :title="item?.product?.title"
@@ -28,9 +45,4 @@ defineProps(["collections", "isFetching"]);
         "
         :rating="item?.product?.rating"
         :products="item"
-      />
-    </div>
-  </div>
-</template>
-
-<style lang="scss" scoped></style>
+      /> -->

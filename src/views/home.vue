@@ -50,18 +50,18 @@ onMounted(async () => await getHome());
     <!--Categories -->
     <div class="hidden md:block my-5">
       <CategoryLoader v-if="isFetching" />
-      <Category :featured_categories="featured_categories" v-else />
+      <Category v-else />
     </div>
     <!-- Sale -->
-    <template v-for="sale in flash_sales">
+    <!-- <template v-for="sale in flash_sales">
       <Sale :flash_sales="sale" />
-    </template>
+    </template> -->
     <!-- Collection -->
     <template v-for="collection in collections">
       <div class="flex justify-between items-center px-4 mt-3">
         <div>
           <h2 class="lg:text-xl font-bold">
-            {{ collection?.title }}
+            {{ collection?.supplier?.company_name }}
           </h2>
         </div>
         <div>
@@ -72,7 +72,7 @@ onMounted(async () => await getHome());
           </button>
         </div>
       </div>
-      <Collection :collections="collection" :isFetching="isFetching" />
+      <Collection :collections="collections" :isFetching="isFetching" />
     </template>
   </Mainlayout>
 </template>

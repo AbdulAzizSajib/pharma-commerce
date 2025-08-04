@@ -1,57 +1,42 @@
 <template>
-  <div class="overflow-hidden product-card">
-    <div
-      class="overflow-hidden relative border border-b-0 rounded rounded-bl-none rounded-br-none"
-    >
+  <div class="overflow-hidden border rounded product-card">
+    <!-- Product Image -->
+    <div class="relative border-b overflow-hidden rounded-t">
       <router-link :to="{ name: 'product-details', params: { id: id || 0 } }">
         <img
-          class="lg:w-full block"
           :src="imageSrc"
           :alt="title"
           @error="setDefaultImage"
+          class="w-full h-auto object-cover"
         />
       </router-link>
-      <div class="absolute top-1 left-1" v-if="stockStatus">
-        <p
-          class="bg-[#a5ffd9] text-center lg:px-5 lg:py-1 p-1 text-[8px] lg:text-base rounded-md"
-        >
-          {{ stockStatus }}
-        </p>
-      </div>
-      <div v-if="discount" class="absolute top-1 right-1">
-        <p
-          class="border-2 text-[8px] bg-[#a5ffd9] border-[#34d08d] rounded-full text-center pt-2 w-10 h-10 lg:w-14 lg:h-14 font-semibold mb-0 lg:text-sm"
-        >
-          {{ discount }} ৳ Save
-        </p>
-      </div>
     </div>
+
+    <!-- Product Content -->
     <div
-      class="p-3 bg-[#e3fff3] border-2 border-t-0 border-[#00C36E] rounded rounded-tl-none rounded-tr-none"
+      class="p-3 bg-[#e3fff3] border-t-0 border-2 border-[#00C36E] rounded-b"
     >
-      <h2 class="lg:text-xl font-semibold" :title="title">
-        {{ title?.length > 20 ? title?.slice(0, 15) + ".." : title }}
+      <!-- Product Info -->
+      <h2 class="text-sm lg:text-base font-semibold truncate" :title="title">
+        {{ title }}
       </h2>
-      <h2 class="lg:text-xl">
-        <a-rate class="text-xs lg:text-2xl" disabled :value="rating" />
-        {{ rating }}
-        <span class="text-gray-400 lg:text-base">({{ reviews }} Reviews)</span>
-      </h2>
-      <div class="flex items-center gap-1">
-        <h2 class="lg:text-3xl font-bold">{{ price }} ৳</h2>
-        <h2 class="lg:text-lg text-red-600 my-1 line-through" v-if="oldPrice">
-          {{ oldPrice }} ৳
-        </h2>
-      </div>
-      <div class="mt-3">
-        <button
-          @click="handleAddToCart"
-          type="button"
-          class="w-full text-xs lg:text-xl btn btn-sm font-medium border-2 border-[#007C46] bg-[#007C46] text-white hover:text-[#007C46] hover:bg-transparent"
+      <p class="text-xs text-gray-600">{{ name }}</p>
+
+      <!-- Price -->
+      <div class="flex items-center gap-2 mt-2">
+        <span class="text-lg lg:text-2xl font-bold text-[#007C46]"
+          >{{ price }} ৳</span
         >
-          Add to Cart
-        </button>
       </div>
+
+      <!-- Add to Cart Button -->
+      <button
+        @click="handleAddToCart"
+        type="button"
+        class="w-full mt-3 text-xs lg:text-sm font-medium border-2 border-[#007C46] bg-[#007C46] text-white hover:text-[#007C46] hover:bg-transparent transition duration-200 rounded px-4 py-2"
+      >
+        Add to Cart
+      </button>
     </div>
   </div>
 </template>
@@ -61,39 +46,31 @@ import { useCartStore } from "@/stores/cart";
 import { storeToRefs } from "pinia";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
-import Loader from "../Loader/Loader.vue";
 import { imgDefault } from "@/config";
 
 const props = defineProps([
   "id",
+  "name",
   "title",
   "price",
-  "oldPrice",
   "imageSrc",
-  "reviews",
-  "stockStatus",
-  "discount",
-  "rating",
   "products",
 ]);
 
-// cart
 const cartStore = useCartStore();
 const { getCart } = cartStore;
-const { isLoading } = storeToRefs(cartStore);
 
-// Add to cart with toast notification
+// Add to Cart with Toast
 const handleAddToCart = () => {
-  getCart(props.id, props.title, props.price, props.imageSrc);
-
-  toast.success(`${props.title} added to cart!`, {
+  getCart(props.id, props.title, props.price, props.imageSrc, props.name, 1);
+  toast.success(`${props.name} added to cart!`, {
     position: "top-center",
     autoClose: 2000,
   });
 };
 
-// Fallback for broken or missing images
+// Set fallback image
 const setDefaultImage = (event) => {
-  event.target.src = `${imgDefault}`;
+  event.target.src = imgDefault;
 };
 </script>

@@ -12,20 +12,22 @@ const homeStore = useHomeStore();
 const brandStore = useBrandStore();
 const { getBrand } = brandStore;
 const { getHome } = homeStore;
-const { featured_categories } = storeToRefs(homeStore);
+const { featured_categories, collections } = storeToRefs(homeStore);
 const { brands } = storeToRefs(brandStore);
 const productsStore = useProductsStore();
 const { getAllProduct } = productsStore;
-const { allProduct, isFetching } = storeToRefs(productsStore);
+const { allProduct, paginationInfo, isFetching } = storeToRefs(productsStore);
 
 const backUp = ref([]);
 onMounted(async () => {
-  await getHome();
-  await getBrand();
-  await getAllProduct(current1.value);
+  // await getHome();
+  // await getBrand();
+  await getAllProduct(current1.value, pageSize.value);
   backUp.value = allProduct?.value;
-  allProduct.value = backUp.value?.result?.data;
-  pageSize.value = backUp?.value?.result?.per_page;
+  allProduct.value = backUp.value.data;
+  // pageSize.value = backUp?.value?.per_page;
+  pageSize.value = paginationInfo?.value?.perPage; // Set the page size
+  current1.value = paginationInfo?.value?.currentPage; // Set the current page
 });
 
 const current1 = ref(1);
@@ -33,11 +35,11 @@ const pageSize = ref(10);
 
 const pagination = async (page) => {
   current1.value = page;
-  // console.log(page);
+
   ratingFilter.value = "";
-  await getAllProduct(page);
+  await getAllProduct(page, pageSize.value);
   backUp.value = allProduct?.value;
-  allProduct.value = backUp.value?.result?.data;
+  allProduct.value = backUp.value;
 };
 
 //  filter
@@ -51,7 +53,7 @@ const sortOrder = ref("A-Z");
 
 // Watch sortOrder and apply sorting whenever it changes
 watch(sortOrder, () => {
-  allProduct.value = [...backUp.value?.result?.data]?.sort((a, b) => {
+  allProduct.value = [...backUp.value]?.sort((a, b) => {
     if (sortOrder.value === "A-Z") {
       return a.title.localeCompare(b.title);
     } else if (sortOrder.value === "Z-A") {
@@ -167,10 +169,7 @@ const filterByPrice = async () => {
                 <li class="flex items-center justify-between">
                   <div class="flex items-center">
                     <ul>
-                      <li
-                        v-for="(cat, index) in featured_categories"
-                        :key="index"
-                      >
+                      <li v-for="(cat, index) in collections" :key="index">
                         <input
                           v-model="categoryFilter"
                           type="radio"
@@ -178,7 +177,7 @@ const filterByPrice = async () => {
                           class=""
                           @change="filterByCategory(cat)"
                         />
-                        {{ cat?.title }}
+                        {{ cat?.category?.name }}
                       </li>
                     </ul>
                   </div>
@@ -246,7 +245,7 @@ const filterByPrice = async () => {
               </div>
               <h2>
                 <span class="font-semibold">
-                  {{ allProduct?.length }}
+                  {{ allProduct.length }}
                 </span>
                 Results Found
               </h2>
@@ -258,18 +257,12 @@ const filterByPrice = async () => {
             >
               <template v-for="(item, index) in allProduct" :key="index">
                 <ProductCard
+                  :name="item?.name"
                   :id="item?.id"
-                  :title="item?.title"
-                  :price="item?.offered > 0 ? item?.offered : item?.selling"
-                  :oldPrice="item?.selling"
-                  :imageSrc="imgBase + item?.image"
-                  :reviews="item?.review_count"
-                  :stockStatus="item?.badge"
-                  :discount="
-                    Math.round(item?.selling - item?.offered).toFixed(1)
-                  "
-                  :rating="item?.rating"
+                  :title="item?.category?.name"
+                  :price="item?.product_prices?.selling_price"
                   :products="item"
+                  :imageSrc="item"
                 />
               </template>
             </div>
@@ -277,7 +270,7 @@ const filterByPrice = async () => {
               class="mt-3"
               v-if="!isFetching"
               v-model:current="current1"
-              :total="backUp?.result?.total"
+              :total="paginationInfo?.total"
               :show-size-changer="false"
               v-model:pageSize="pageSize"
               :show-total="(total) => `Total ${total} items`"

@@ -293,7 +293,7 @@ const isMenuOpen = ref(false);
 const homeStore = useHomeStore();
 const { getCategories } = homeStore;
 const { featured_categories, isLoading } = storeToRefs(homeStore);
-onMounted(async () => await getCategories());
+// onMounted(async () => await getCategories());
 
 // Cart Store
 const cartStore = useCartStore();

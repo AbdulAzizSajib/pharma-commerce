@@ -13,7 +13,6 @@ export const useCartStore = defineStore("cartStore", {
   getters: {
     totalPrice() {
       if (!Array.isArray(this.cartProduct)) {
-        // Ensure cartProduct is an array in case of any issues with data persistence
         this.cartProduct = [];
       }
       return this.cartProduct.reduce((total, product) => {
@@ -23,15 +22,17 @@ export const useCartStore = defineStore("cartStore", {
   },
 
   actions: {
-    getCart(id, title, price, image, quantity = 1) {
+    getCart(id, title, price, image, name, quantity = 1) {
       // let quantity = 1;
       const index = this.cartProduct.findIndex((data) => data?.id == id);
       if (index == -1) {
         this.cartProduct?.push({
           id: id,
+
           title: title,
           price: Number(price).toFixed(2),
           image: image,
+          name: name,
           quantity: quantity,
         });
       } else {

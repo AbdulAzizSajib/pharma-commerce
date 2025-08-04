@@ -17,5 +17,5 @@ const commonStore = useCommonStore();
 const { getCommon } = commonStore;
 const { footer, header } = storeToRefs(commonStore);
 
-onMounted(async () => await getCommon());
+// onMounted(async () => await getCommon());
 </script>

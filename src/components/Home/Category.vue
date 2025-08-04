@@ -10,13 +10,11 @@
     :modules="modules"
     class="mySwiper"
   >
-    <!-- Loop through the companies and display the company letters in swiper slides -->
     <swiper-slide v-for="cat in companies" :key="cat?.id">
       <div class="w-full flex flex-col justify-center items-center">
         <div
           class="bg-[#61acf3] rounded-full w-16 h-16 flex justify-center items-center cursor-pointer text-white font-bold text-2xl uppercase"
         >
-          <!-- Display the first and last letter if there are two words in the company name -->
           {{
             cat?.company_name?.split(" ").length === 2
               ? cat?.company_name?.split(" ")[0].charAt(0) +
@@ -26,7 +24,6 @@
         </div>
 
         <h2 class="mt-2 font-semibold text-base text-center">
-          <!-- {{ cat?.company_name }} -->
           {{ cat?.company_name?.split(" ")?.at(0) }}
         </h2>
       </div>
@@ -68,9 +65,8 @@ const getCompanies = async () => {
   }
 };
 
-// Fetch companies when component is mounted
-onMounted(() => getCompanies());
-
-// Modules for Swiper
-const modules = [FreeMode, Pagination];
+onMounted(async () => {
+  console.log("Mounted called");
+  await getCompanies();
+});
 </script>
