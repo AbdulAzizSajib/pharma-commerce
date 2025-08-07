@@ -209,6 +209,7 @@
 
         <router-link to="/checkout">
           <button
+            @click="checkoutHandler"
             class="btn w-full rounded-full bg-green-600 text-white text-lg capitalize hover:bg-green-700 mt-4"
           >
             Proceed to Checkout
@@ -257,6 +258,16 @@ const updateQty = (product) => {
   totalPrice.value = cartProduct.value?.reduce((sum, product) => {
     return sum + (product.total_price || 0);
   }, 0);
+};
+
+const checkoutHandler = (e) => {
+  if (totalPrice.value <= 0) {
+    e.preventDefault();
+    showNotification(
+      "error",
+      "Your cart is empty. Please add items to proceed to checkout."
+    );
+  }
 };
 </script>
 
