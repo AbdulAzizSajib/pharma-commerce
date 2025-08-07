@@ -21,7 +21,6 @@ export const useHomeStore = defineStore("homeStore", {
         this.isLoading = false;
         if (res?.status == 200) {
           this.collections = res?.data;
-          console.log(res.data);
         }
       } catch (error) {
         this.isLoading = false;

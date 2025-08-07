@@ -48,6 +48,8 @@
                 <th class="py-2">Product</th>
                 <th class="py-2 text-right">Price (BDT)</th>
                 <th class="py-2 text-center">Quantity</th>
+                <th class="py-2 text-center">Pack/Pcs</th>
+                <th class="py-2 text-center">Total quantity</th>
                 <th class="py-2 text-right">Subtotal (BDT)</th>
                 <th class="py-2 text-right">Action</th>
               </tr>
@@ -62,8 +64,9 @@
                 </td>
               </tr>
               <!-- <pre>
-                {{ cartProduct[0]?.image?.name }}
-            </pre> -->
+                {{ cartProduct[0] }}
+            </pre
+              > -->
               <tr v-for="(product, index) in cartProduct" :key="index">
                 <td>
                   <div class="flex items-center gap-3">
@@ -73,14 +76,13 @@
                       </div>
                     </div>
                     <div>
-                      <h1 class="text-sm">{{ product?.image?.name }}</h1>
-                      <div :title="product?.title" class="">
+                      <h1 class="text-sm">
                         {{
-                          product?.title?.length > 20
-                            ? product?.title?.slice(0, 20) + ".."
-                            : product?.title
+                          product?.name?.length > 20
+                            ? product?.name?.slice(0, 20)
+                            : product?.name
                         }}
-                      </div>
+                      </h1>
                     </div>
                   </div>
                 </td>
@@ -90,7 +92,20 @@
                 <td>
                   <div class="flex justify-center items-center">
                     <button
-                      @click="product.quantity++"
+                      @click="
+                        () => {
+                          let stock = product?.stock_batches?.length
+                            ? calculateStock(product?.stock_batches)
+                            : 0;
+
+                          if (product.quantity < stock) product.quantity++;
+                          else {
+                            showNotification('warning', 'Sorry! Stock Out');
+                            product.quantity = stock;
+                          }
+                          updateQty(product);
+                        }
+                      "
                       class="btn btn-outline btn-sm"
                     >
                       +
@@ -98,21 +113,57 @@
                     <input
                       class="w-12 mx-2 text-center rounded-md"
                       v-model="product.quantity"
+                      @focus="$event?.target?.select()"
+                      @input="
+                        () => {
+                          if (product.quantity < 0) product.quantity = 0;
+                          let stock = product?.stock_batches?.length
+                            ? calculateStock(product?.stock_batches)
+                            : 0;
+
+                          if (product.quantity > stock) {
+                            showNotification('warning', 'Sorry! Stock Out');
+                            product.quantity = stock;
+                          }
+
+                          updateQty(product);
+                        }
+                      "
                       type="number"
                       min="0"
                     />
                     <button
-                      @click="product.quantity > 0 && product.quantity--"
+                      @click="
+                        () => {
+                          if (product.quantity > 0) product.quantity--;
+                          else product.quantity = 0;
+                          updateQty(product);
+                        }
+                      "
                       class="btn btn-outline btn-sm"
                     >
                       -
                     </button>
                   </div>
                 </td>
+                <td class="">
+                  <select
+                    class="border rounded-sm"
+                    v-model="product.pack_select"
+                    @change="updateQty(product)"
+                  >
+                    <option value="1">Pcs (1)</option>
+                    <option value="2">
+                      Pack ({{ product?.pack_size?.quantity }})
+                    </option>
+                  </select>
+                </td>
+
                 <td class="text-right">
-                  <span>{{
-                    Number(product.price * product.quantity).toFixed(2)
-                  }}</span>
+                  <span>{{ product.total_quantity }}</span>
+                </td>
+                <td class="text-right">
+                  <span>{{ formatNumber(product?.total_price) }}</span>
                 </td>
                 <td class="text-right">
                   <button class="text-lg text-red-500">
@@ -120,7 +171,10 @@
                       title="Are you sure delete?"
                       ok-text="Yes"
                       cancel-text="No"
-                      @confirm="cartProduct.splice(index, 1)"
+                      @confirm="
+                        cartProduct.splice(index, 1);
+                        updateQty(product);
+                      "
                     >
                       <DeleteOutlined />
                     </a-popconfirm>
@@ -130,30 +184,6 @@
             </tbody>
           </table>
         </div>
-
-        <!-- Coupon Section -->
-        <!-- <div
-          class="border gap-2 rounded-lg flex flex-col lg:flex-row items-center justify-between mt-2 p-4"
-        >
-          <h1
-            class="text-lg font-semibold tracking-wider text-center lg:text-left"
-          >
-            Coupon
-          </h1>
-          <div class="flex w-full lg:w-auto">
-            <input
-              type="text"
-              placeholder="Enter coupon code"
-              class="flex-grow lg:flex-shrink border rounded-l-lg p-2"
-            />
-            <button
-              type="button"
-              class="rounded-r-lg bg-zinc-900 text-white px-4"
-            >
-              Apply Coupon
-            </button>
-          </div>
-        </div> -->
       </div>
 
       <!-- Right Column: Cart Summary -->
@@ -164,21 +194,14 @@
             <tr class="border-b">
               <td class="py-2">Subtotal:</td>
               <td class="text-right py-2">
-                {{ Number(totalPrice).toFixed(2) }} BDT
+                {{ formatNumber(totalPrice || 0) }} BDT
               </td>
             </tr>
-            <tr class="border-b">
-              <td class="py-2">Coupon:</td>
-              <td class="text-right py-2">-</td>
-            </tr>
-            <tr class="border-b">
-              <td class="py-2">Shipping:</td>
-              <td class="text-right py-2">-</td>
-            </tr>
+
             <tr class="border-b">
               <td class="py-2 font-semibold">Total:</td>
               <td class="text-right py-2 font-semibold">
-                {{ Number(totalPrice).toFixed(2) }} BDT
+                {{ formatNumber(totalPrice || 0) }} BDT
               </td>
             </tr>
           </tbody>
@@ -203,9 +226,38 @@ import { DeleteOutlined, HomeOutlined } from "@ant-design/icons-vue";
 import { useCartStore } from "@/stores/cart";
 import { storeToRefs } from "pinia";
 import default_img from "../../assets/images/Banner/default.jpg";
+import { showNotification } from "../../../utilities/notification";
+import { formatNumber } from "@/config";
 
 const cartStore = useCartStore();
 const { cartProduct, totalPrice } = storeToRefs(cartStore);
+
+const calculateStock = (stockes) => {
+  const total = stockes?.reduce((sum, batch) => {
+    const balanced_quantity = parseFloat(batch?.balanced_quantity);
+    return sum + (isNaN(balanced_quantity) ? 0 : balanced_quantity);
+  }, 0);
+  return Number(total).toFixed(2);
+};
+const pp = ref("psc"); // initial value
+
+const totalQty = ref("");
+
+const updateQty = (product) => {
+  if (product?.pack_select == 2) {
+    product.total_quantity =
+      Number(product?.pack_size?.quantity || 0) * Number(product?.quantity);
+  } else {
+    product.total_quantity = Number(product?.quantity);
+  }
+  product.total_price = Math.round(
+    Number(product.total_quantity || 0) * Number(product?.price || 0)
+  );
+
+  totalPrice.value = cartProduct.value?.reduce((sum, product) => {
+    return sum + (product.total_price || 0);
+  }, 0);
+};
 </script>
 
 <style lang="scss" scoped></style>

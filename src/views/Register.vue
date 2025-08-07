@@ -98,9 +98,14 @@
             <div class="space-y-4">
               <button
                 type="submit"
-                class="w-full px-4 py-3 font-semibold text-white rounded-lg bg-gradient-to-r from-green-600 to-green-400 hover:from-green-500 hover:to-green-300 transition-all duration-300 shadow-lg hover:shadow-xl"
+                class="w-full px-4 py-3 font-semibold text-white rounded-lg bg-gradient-to-r from-green-600 to-green-400 hover:from-green-500 hover:to-green-300 transition-all duration-300 shadow-lg hover:shadow-xl flex justify-center items-center gap-5"
               >
-                Register
+                <span>{{ isLoading ? "Processing ..." : "Register" }}</span>
+                <Icon
+                  v-if="isLoading"
+                  class="size-5 animate-spin"
+                  icon="icon-park-outline:loading"
+                />
               </button>
 
               <p class="text-sm text-center text-gray-600">
@@ -128,9 +133,13 @@ import { HomeOutlined, RightOutlined } from "@ant-design/icons-vue";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { showNotification } from "../../utilities/notification";
+import axios from "axios";
+import { apiBasePharma } from "@/config";
+import { Icon } from "@iconify/vue";
 const registerStore = useRegisterStore();
 const { registerUser } = registerStore;
 const router = useRouter();
+const isLoading = ref(false);
 
 const formData = ref({
   name: "",
@@ -157,28 +166,42 @@ const handleRegister = async () => {
       showNotification("warning", "Password is required");
       return;
     }
-
-    const res = await registerUser(formData.value);
-
-    // If backend returned validation errors
-    if (res?.error && res.data?.message) {
-      const errors = res.data.message;
-      Object.keys(errors).forEach((field) => {
-        errors[field].forEach((msg) => {
-          showNotification("error", msg);
-        });
-      });
-      return;
-    }
+    isLoading.value = true;
+    const res = await axios.post(
+      `${apiBasePharma}/user-register`,
+      formData.value
+    );
+    console.log(res.data);
 
     // Success flow
-    if (res?.data) {
+    if (res?.data?.status === "success") {
       showNotification("success", res.data.message);
-      router.push({ name: "login" });
+      setTimeout(() => {
+        router.push({ name: "login" });
+      }, 1000);
+    } else {
+      showNotification("error", "Registration Failed");
     }
   } catch (error) {
+    isLoading.value = false;
     console.log(error);
-    showNotification("error", "Something went wrong");
+
+    if (error.response && error.response.data && error.response.data.message) {
+      const messages = error.response.data.message;
+
+      // Loop through each field (email, password, etc.)
+      for (const field in messages) {
+        if (Array.isArray(messages[field])) {
+          messages[field].forEach((msg) => {
+            showNotification("error", msg);
+          });
+        } else {
+          showNotification("error", messages[field]);
+        }
+      }
+    } else {
+      showNotification("error", "Something went wrong");
+    }
   }
 };
 </script>

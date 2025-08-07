@@ -106,25 +106,46 @@ import { useLoginStore } from "@/stores/login";
 import { HomeOutlined, RightOutlined } from "@ant-design/icons-vue";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import { showNotification } from "../../utilities/notification";
+import axios from "axios";
+import { apiBasePharma } from "@/config";
 
 const loginStore = useLoginStore();
 const { LoginUser } = loginStore;
 const router = useRouter();
+const isLoading = ref(false);
 
 const email = ref("");
 const password = ref("");
 
 const handleLogin = async () => {
-  const res = await LoginUser({
-    email: email.value,
-    password: password.value,
-  });
+  if (!email.value) {
+    return showNotification("warning", "email required");
+  }
+  if (!password.value) {
+    return showNotification("warning", "email required");
+  }
+  try {
+    const res = await axios.post(`${apiBasePharma}/user-login`, {
+      email: email.value,
+      password: password.value,
+    });
 
-  if (res?.token) {
-    console.log("Login successful:", res);
-    router.push("/");
-  } else {
-    console.log(res?.message);
+    console.log("res.data", res?.data?.message);
+    isLoading.value = false;
+    if (res?.data?.status === "success") {
+      localStorage.setItem("token", res?.data?.token);
+      localStorage.setItem("user", JSON.stringify(res?.data?.user));
+      showNotification("success", res?.data?.message);
+      setTimeout(() => {
+        router.push("/");
+      }, 1000);
+    } else {
+      showNotification("error", "Email or Password is incorrect");
+    }
+  } catch (error) {
+    // isLoading.value = false;
+    console.log(error);
   }
 };
 </script>

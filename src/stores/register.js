@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { apiBase } from "@/config";
+import { apiBase, apiBasePharma } from "@/config";
 import axios from "axios";
 
 export const useRegisterStore = defineStore("registerStore", {
@@ -11,11 +11,13 @@ export const useRegisterStore = defineStore("registerStore", {
     async registerUser(userData) {
       this.isFetching = true;
       try {
-        const res = await axios.post(`${apiBase}/user/signup`, userData);
+        const res = await axios.post(
+          `${apiBasePharma}/user-register`,
+          userData
+        );
         this.isFetching = false;
 
-        if (res?.status == 200) {
-          console.log(res?.data);
+        if (res?.data) {
           return res?.data;
         } else {
           console.log("Registration failed:", res?.data?.message);

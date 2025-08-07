@@ -8,38 +8,70 @@ export const useCartStore = defineStore("cartStore", {
     cartProduct: [],
     cuPon: 0,
     isOrderDone: false,
+    totalPrice: 0,
   }),
 
   getters: {
-    totalPrice() {
-      if (!Array.isArray(this.cartProduct)) {
-        this.cartProduct = [];
-      }
-      return this.cartProduct.reduce((total, product) => {
-        return total + product.quantity * product.price;
-      }, 0);
-    },
+    // totalPrice() {
+    //   if (!Array.isArray(this.cartProduct)) {
+    //     this.cartProduct = [];
+    //   }
+    //   return this.cartProduct.reduce((total, product) => {
+    //     return total + product.quantity * product.price;
+    //   }, 0);
+    // },
   },
 
   actions: {
-    getCart(id, title, price, image, name, quantity = 1) {
-      // let quantity = 1;
-      const index = this.cartProduct.findIndex((data) => data?.id == id);
-      if (index == -1) {
-        this.cartProduct?.push({
-          id: id,
-
-          title: title,
-          price: Number(price).toFixed(2),
-          image: image,
-          name: name,
-          quantity: quantity,
-        });
-      } else {
-        quantity++;
-        this.cartProduct[index].quantity++;
-      }
+    calculateTotal() {
+      this.totalPrice = this.cartProduct?.reduce((sum, product) => {
+        return sum + (product?.total_price || 0);
+      }, 0);
     },
+    getCart(product) {
+      let quantity = 1;
+      let price = Number(product?.product_prices?.selling_price || 0);
+      const index = this.cartProduct?.findIndex(
+        (item) => item?.id == product?.id
+      );
+      if (index != -1) {
+        this.cartProduct[index].quantity = this.cartProduct[index].quantity + 1;
+        this.cartProduct[index].price =
+          this.cartProduct[index].price * this.cartProduct[index].quantity;
+      } else {
+        this.cartProduct = [
+          {
+            ...product,
+            quantity: quantity,
+            total_quantity: quantity,
+            price: price,
+            total_price: price * quantity,
+            pack_select: "1",
+          },
+          ...this.cartProduct,
+        ];
+      }
+      this.calculateTotal();
+    },
+
+    // getCart(id, title, price, image, name, quantity = 1) {
+    //   // let quantity = 1;
+    //   const index = this.cartProduct.findIndex((data) => data?.id == id);
+    //   if (index == -1) {
+    //     this.cartProduct?.push({
+    //       id: id,
+
+    //       title: title,
+    //       price: Number(price).toFixed(2),
+    //       image: image,
+    //       name: name,
+    //       quantity: quantity,
+    //     });
+    //   } else {
+    //     quantity++;
+    //     this.cartProduct[index].quantity++;
+    //   }
+    // },
 
     async orderPlace(orderData, order_method, user_address_id, userid) {
       const token = localStorage.getItem("token");

@@ -4,12 +4,9 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: 'oklch(68.5% 0.169 237.323)',
-
+        primary: "#1c1917",
       },
     },
   },
-  plugins: [
-    require('daisyui'),
-  ],
+  plugins: [require("daisyui")],
 };

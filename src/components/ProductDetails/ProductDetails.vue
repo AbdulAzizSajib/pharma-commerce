@@ -124,7 +124,7 @@
               {{ productDetail?.product?.name }}
             </h1>
             <p class="text-sm p-1">
-              Generics : {{ productDetail?.generics[0]?.name }}
+              Generics : {{ productDetail?.product?.generic?.name }}
             </p>
             <p class="text-sm p-1">
               Categories : {{ productDetail?.categories?.at(0)?.name }}

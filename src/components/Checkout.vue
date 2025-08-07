@@ -140,8 +140,8 @@
                   <span>৳ {{ totalPrice }}</span>
                 </li>
                 <li class="flex justify-between text-gray-700">
-                  <span>Coupon</span>
-                  <span>৳ {{ cuPon }}</span>
+                  <span>Shipping</span>
+                  <span>৳ 0.00</span>
                 </li>
                 <li
                   class="flex justify-between text-lg font-semibold text-orange-500 mt-3"

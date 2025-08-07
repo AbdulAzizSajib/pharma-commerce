@@ -5,18 +5,17 @@ import "swiper/css/navigation";
 import { Autoplay, Navigation } from "swiper/modules";
 import sliderImg_one from "../../assets/images/Banner/1.jpeg";
 import sliderImg_two from "../../assets/images/Banner/4.jpeg";
-// import sliderImg_one from "../../assets/images/Banner/slider_One.jpg";
 
 const modules = [Autoplay, Navigation];
 
-const sliders = [{ image: sliderImg_two }];
+const sliders = [{ image: sliderImg_two }, { image: sliderImg_one }];
 </script>
 
 <template>
   <swiper :modules="modules" :navigation="true" class="w-full">
     <swiper-slide v-for="(slide, index) in sliders" :key="index">
       <img
-        class="w-full h-[645PX] object-cover"
+        class="w-full h-[645px] object-cover"
         :src="slide.image"
         alt="Slide Image"
       />

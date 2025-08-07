@@ -37,7 +37,7 @@
 
       <!-- Add to Cart Button -->
       <button
-        @click="handleAddToCart"
+        @click="handleAddToCart(products)"
         type="button"
         class="w-full mt-3 text-xs lg:text-sm font-medium border-2 border-[#007C46] bg-[#007C46] text-white hover:text-[#007C46] hover:bg-transparent transition duration-200 rounded px-4 py-2"
       >
@@ -67,8 +67,9 @@ const cartStore = useCartStore();
 const { getCart } = cartStore;
 
 // Add to Cart with Toast
-const handleAddToCart = () => {
-  getCart(props.id, props.title, props.price, props.imageSrc, props.name, 1);
+const handleAddToCart = (products) => {
+  // getCart(props.id, props.title, props.price, props.imageSrc, props.name, 1);
+  getCart(products);
   toast.success(`${props.name} added to cart!`, {
     position: "top-center",
     autoClose: 2000,
